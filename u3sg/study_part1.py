@@ -1,4 +1,4 @@
-"""Module to connect to sqlite3 database"""
+"""Module to create a sqlite3 database call school"""
 import sqlite3
 
 
