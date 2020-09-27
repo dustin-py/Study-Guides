@@ -12,25 +12,50 @@ def query_sg_answers(context_arr, query_arr, cursor):
     for e, query in enumerate(query_arr):
         q = cursor.execute(query).fetchall()
         a = context_arr[e]
-        print(f"{a}: {q}\n")
+        print(f"{a} {q}\n")
         
 
 def main():
     database = r'Chinook_Sqlite.sqlite'
     context_arr = (
-        "Top 5 average invoice total per customer",
-        "First 5 customers from the US",
-        "Employees that don't report to anyone",
-        "Number of unique composers",
-        "Number of rows in track table",
-    )
+        "Top 5 average invoice total per customer:",
+        "First 5 customers from the US:",
+        "Employees that don't report to anyone:",
+        "Number of unique composers:",
+        "Number of rows in track table:",
+        "All black sabbath tracks:\n",
+        "Most popular genre by num of tracks:\n",
+        "All customers that spent more than $45:\n")
+    
     query_array = (
         "SELECT customerid, total FROM invoice ORDER BY total LIMIT 5;",
         "SELECT * FROM customer WHERE country LIKE '%USA%' LIMIT 5;",
         "SELECT * FROM employee WHERE reportsto IS NULL;",
         "SELECT COUNT(DISTINCT composer) FROM track;",
         "SELECT COUNT(*) FROM track;",
-    )
+        "SELECT \
+            track.name, \
+            album.title, \
+            track.composer \
+        FROM track \
+        JOIN album \
+        ON track.albumid = album.albumid \
+        WHERE composer LIKE '%sabbath%';",
+        "SELECT \
+            genre.name, \
+            COUNT(track.genreid) AS `genre_count` \
+        FROM genre \
+        JOIN track \
+        ON genre.genreid = track.genreid \
+        GROUP BY genre.name;",
+        "SELECT \
+            customer.lastname, \
+            SUM(invoice.total) as sum_total \
+        FROM invoice \
+        JOIN customer \
+        ON invoice.customerid = customer.customerid \
+        GROUP BY invoice.customerid \
+        HAVING sum_total > 45;")
     connection, cursor = database_connector(database=database)
     query_sg_answers(context_arr, query_array, cursor)
     connection.close()
